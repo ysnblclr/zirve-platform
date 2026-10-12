@@ -1,8 +1,9 @@
 # Zirve Platformu
 
-Finviz'de **tüm zamanların** ve **52 haftanın zirvesindeki** ABD hisselerini ve ETF'lerini tarar,
-her birine **1 yıllık yükseliş potansiyeli puanı (0–100)** ve **risk seviyesi** verir. Taramalar,
-izleme listesi, performans takibi ve model analizi tarayıcıda açılan bir panelden yönetilir.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ysnblclr/zirve-platform)
+
+Finviz'de **tüm zamanların (Gerçek ATH)** ve **52 haftanın zirvesindeki** ABD hisselerini ve ETF'lerini tarar,
+her birine **1 yıllık Multi-Bagger yükseliş potansiyeli puanı (0–100)**, **Fırsat Arketipi**, **Yatırım Tezi** ve somut **Trading Planı (Stop-Loss, Hedef 1 & 2)** üretir.
 
 ## Başlatma
 

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: zirve-platform
+    runtime: python
+    branch: master
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: python sunucu.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
