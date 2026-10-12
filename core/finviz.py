@@ -77,6 +77,14 @@ def earnings_date(value: str | None, today: dt.date | None = None) -> tuple[dt.d
     return d, d >= today
 
 
+try:
+    from curl_cffi import requests as cffi_requests
+    HAS_CURL_CFFI = True
+except ImportError:
+    import requests as cffi_requests
+    HAS_CURL_CFFI = False
+
+
 class FinvizClient:
     def __init__(self, delay: float = 0.8, retries: int = 4, timeout: int = 25, verbose: bool = True,
                  log=None):
@@ -86,11 +94,25 @@ class FinvizClient:
         self.verbose = verbose
         self.log_fn = log or (lambda m: print(m, flush=True))
         self._last = 0.0
-        self.session = requests.Session()
-        self.session.headers.update({"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.9"})
+        self._warmed = False
+        if HAS_CURL_CFFI:
+            self.session = cffi_requests.Session(impersonate="chrome124")
+        else:
+            self.session = requests.Session()
+            self.session.headers.update({
+                "User-Agent": USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+            })
 
     def _get(self, path: str, params: dict | None = None) -> str:
         url = BASE + path
+        if not self._warmed:
+            try:
+                self.session.get(BASE, timeout=10)
+                self._warmed = True
+            except Exception:
+                pass
         for attempt in range(self.retries + 1):
             wait = self.delay - (time.time() - self._last)
             if wait > 0:
@@ -98,7 +120,7 @@ class FinvizClient:
             self._last = time.time()
             try:
                 r = self.session.get(url, params=params, timeout=self.timeout)
-            except requests.RequestException as exc:
+            except Exception as exc:
                 if attempt == self.retries:
                     raise
                 self._log(f"  bağlantı hatası ({exc.__class__.__name__}), yeniden deneniyor...")
