@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  zirve:
+    build: .
+    container_name: zirve_platform
+    restart: unless-stopped
+    ports:
+      - "8795:8795"
+    volumes:
+      - ./veri:/app/veri
+    environment:
+      # İsteğe bağlı: İnternete açtığınızda şifre koymak için alttaki satırları açabilirsiniz:
+      # - ZIRVE_KULLANICI=admin
+      # - ZIRVE_SIFRE=guclu_sifreniz_123
+      - PYTHONUNBUFFERED=1

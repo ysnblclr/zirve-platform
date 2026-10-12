@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Finviz'de zirvedeki ABD hisselerini ve ETF'lerini 1 yıllık yükseliş potansiyeline göre puanlayan, bilgisayarınızda çalışan tarama platformu.">
+<title>Zirve Platformu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M3 26 L12 12 L18 19 L29 5' fill='none' stroke='%23067797' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script>
+  // Tema seçimi sayfa çizilmeden uygulanır (yanıp sönmeyi önler)
+  try { const t = localStorage.getItem("tema"); if (t === "acik" || t === "koyu") document.documentElement.dataset.tema = t; } catch (e) { /* depolama kapalı */ }
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="atla" href="#icerik">İçeriğe geç</a>
+
+<header class="ust">
+  <div class="kap ust-ic">
+    <a class="marka" href="#/">Zirve <span>Platformu</span></a>
+    <nav aria-label="Ana menü">
+      <ul class="menu">
+        <li><a href="#/" data-r="panel">Panel</a></li>
+        <li><a href="#/taramalar" data-r="taramalar">Taramalar</a></li>
+        <li><a href="#/izleme" data-r="izleme">İzleme listesi</a></li>
+        <li><a href="#/performans" data-r="performans">Performans</a></li>
+        <li><a href="#/analiz" data-r="analiz">Analiz</a></li>
+        <li><a href="#/ayarlar" data-r="ayarlar">Ayarlar</a></li>
+      </ul>
+    </nav>
+    <div class="ust-sag">
+      <form class="arama" id="ara" role="search">
+        <label for="q" class="sr-only">Sembol ara</label>
+        <input id="q" type="search" placeholder="Sembol, ör. GTLB, PLTR, BWET" maxlength="10" autocomplete="off" spellcheck="false" aria-keyshortcuts="/">
+        <button class="dugme dugme--kucuk" type="submit">Ara</button>
+      </form>
+      <a class="ust-link" href="#/uyarilar" data-r="uyarilar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="etiket-metni">Uyarılar</span><span class="sayac" id="uyari-sayi" hidden></span>
+      </a>
+      <a class="ust-link" href="#/yardim" data-r="yardim">Yardım</a>
+    </div>
+  </div>
+  <div class="is-durumu" id="is-durumu" hidden>
+    <div class="kap">
+      <span id="is-metin"></span>
+      <progress id="is-ilerleme" max="100" value="0" aria-labelledby="is-metin"></progress>
+      <a href="#/taramalar" id="is-bag">Ayrıntılar</a>
+    </div>
+  </div>
+</header>
+
+<main id="icerik" tabindex="-1">
+  <div class="kap"><p class="ikincil">Yükleniyor</p></div>
+</main>
+
+<footer class="alt">
+  <div class="kap">
+    <span>Veriler: Finviz (yaklaşık 15 dakika gecikmeli) ve Yahoo Finance. Bu bir tarama aracıdır, yatırım tavsiyesi değildir.</span>
+    <a href="#/yardim">Yardım ve terimler</a>
+  </div>
+</footer>
+
+<!-- Ekran okuyucu duyuruları: bölgeler sayfa açılırken hazır olmalı, içerik sonradan yazılır -->
+<div class="sr-only" id="canli" role="status" aria-live="polite" aria-atomic="true"></div>
+<div class="bildirimler" id="bildirimler" role="status" aria-live="polite"></div>
+
+<dialog id="onay" aria-labelledby="onay-baslik" aria-describedby="onay-metin">
+  <form method="dialog">
+    <h2 id="onay-baslik"></h2>
+    <p id="onay-metin"></p>
+    <div class="dugmeler">
+      <button class="dugme" value="iptal" id="onay-iptal">Vazgeç</button>
+      <button class="dugme dugme--tehlike-dolu" value="tamam" id="onay-tamam"></button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
