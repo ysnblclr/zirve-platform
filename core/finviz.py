@@ -78,6 +78,12 @@ def earnings_date(value: str | None, today: dt.date | None = None) -> tuple[dt.d
 
 
 try:
+    import cloudscraper
+    HAS_CLOUDSCRAPER = True
+except ImportError:
+    HAS_CLOUDSCRAPER = False
+
+try:
     from curl_cffi import requests as cffi_requests
     HAS_CURL_CFFI = True
 except ImportError:
@@ -95,7 +101,11 @@ class FinvizClient:
         self.log_fn = log or (lambda m: print(m, flush=True))
         self._last = 0.0
         self._warmed = False
-        if HAS_CURL_CFFI:
+        if HAS_CLOUDSCRAPER:
+            self.session = cloudscraper.create_scraper(
+                browser={"browser": "chrome", "platform": "windows", "desktop": True}
+            )
+        elif HAS_CURL_CFFI:
             self.session = cffi_requests.Session(impersonate="chrome124")
         else:
             self.session = requests.Session()
