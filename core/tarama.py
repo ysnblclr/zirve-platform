@@ -16,6 +16,7 @@ from .finviz import ETF_COLUMNS, STOCK_COLUMNS, FinvizClient, num
 from .paths import ANALYSIS_FILE, UNIVERSE_FILE
 from .puanlama import score_etfs, score_stocks
 from .teknik import clean, contributions, features_at, fetch_prices, predict, session, transform
+from .yahoo_screener import fetch_yahoo_ath_etfs, fetch_yahoo_ath_stocks
 
 Log = Callable[..., None]   # log(mesaj, oran=None)
 
@@ -127,13 +128,21 @@ def run_scan(options: dict, trigger: str = "elle", log: Log = _noop) -> int:
     try:
         client = FinvizClient(log=log)
         now = dt.datetime.now()
-        log("Finviz'den zirve listeleri çekiliyor...", 0.02)
-        stock_rows = [] if opts.get("sadece_etf") else fetch(client, stock_queries(opts["mod"], opts["kucuk"]),
-                                                             STOCK_COLUMNS)
-        log(f"{len(stock_rows)} hisse bulundu. ETF listeleri çekiliyor...", 0.25)
-        etf_rows = [] if opts.get("sadece_hisse") else fetch(client, etf_queries(opts["mod"]), ETF_COLUMNS)
-        log(f"{len(etf_rows)} ETF bulundu. Endüstri performansları çekiliyor...", 0.4)
-        industries = client.industries()
+        log("Zirve listeleri taranıyor...", 0.02)
+        try:
+            stock_rows = [] if opts.get("sadece_etf") else fetch(client, stock_queries(opts["mod"], opts["kucuk"]),
+                                                                 STOCK_COLUMNS)
+            log(f"{len(stock_rows)} hisse bulundu. ETF listeleri çekiliyor...", 0.25)
+            etf_rows = [] if opts.get("sadece_hisse") else fetch(client, etf_queries(opts["mod"]), ETF_COLUMNS)
+            log(f"{len(etf_rows)} ETF bulundu. Endüstri performansları çekiliyor...", 0.4)
+            industries = client.industries()
+        except Exception as exc:
+            log(f"Finviz bulut korumasına takıldı ({exc}). Yedek motor devreye alınıyor: Yahoo Finance All-Time High akışı çekiliyor...", 0.15)
+            stock_rows = [] if opts.get("sadece_etf") else fetch_yahoo_ath_stocks(count=100)
+            log(f"Yahoo Finance'den {len(stock_rows)} zirve hissesi çekildi. Lider ETF'ler alınıyor...", 0.25)
+            etf_rows = [] if opts.get("sadece_hisse") else fetch_yahoo_ath_etfs(count=50)
+            log(f"{len(etf_rows)} ETF başarıyla eklendi.", 0.4)
+            industries = {}
 
         model = load_model()
         if not model:
