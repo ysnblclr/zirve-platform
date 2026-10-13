@@ -806,7 +806,8 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
 def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), DashboardHandler)
+    host = "0.0.0.0"
+    server = http.server.ThreadingHTTPServer((host, PORT), DashboardHandler)
     url = f"http://127.0.0.1:{PORT}"
     print(f"=====================================================")
     print(f" Zirve Kontrol Merkezi Calisiyor: {url}")
@@ -814,8 +815,9 @@ def main():
     print(f" Kapatmak icin bu pencereyi kapatin veya Ctrl+C.")
     print(f"=====================================================")
 
-    # Tarayıcıda aç
-    threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+    # Windows masaüstünde tarayıcıda otomatik aç
+    if os.name == "nt":
+        threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
     try:
         server.serve_forever()
