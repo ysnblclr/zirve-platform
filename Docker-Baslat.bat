@@ -35,8 +35,8 @@ if %errorlevel% equ 0 (
     echo ====================================================
     echo  - Web Platformu:   http://127.0.0.1:8795
     echo  - Kontrol Paneli:  http://127.0.0.1:8999
-    echo.
-    echo  Tunel baglantisini gormek icin 'Docker-Loglar.bat' calistirabilirsiniz.
+    echo [BILGI] Canli Internet Tunel baglantisi aliniyor...
+    powershell -NoProfile -Command "$logs = docker logs zirve_tunel 2>&1; if ($logs -match 'https://[a-zA-Z0-9\-]+\.trycloudflare\.com') { $u = $matches[0]; Write-Host '  - Internet Adresi: ' $u; '[InternetShortcut]`nURL=' + $u | Out-File -FilePath 'C:\Users\Msi\Desktop\Zirve Internet Linki.url' -Encoding ascii; Write-Host '  - Masaustune ''Zirve Internet Linki'' kisayolu kaydedildi.' }"
     echo ====================================================
     start http://127.0.0.1:8795
 ) else (
