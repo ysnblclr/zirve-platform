@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sunucu",
+    "ad": "Zirve Web Platformu",
+    "aciklama": "Yeni nesil True-ATH ve Multi-Bagger araştırma platformu sunucusu (Port 8795)",
+    "komut": "python sunucu.py --port 8795 --ag --acma",
+    "dizin": "",
+    "port": 8795,
+    "url": "http://127.0.0.1:8795",
+    "yerlesik": true
+  },
+  {
+    "id": "tunel",
+    "ad": "Cloudflare İnternet Tüneli",
+    "aciklama": "Platformu dış dünyadan (telefondan/tabletten) erişilebilir kılan canlı HTTPS tüneli",
+    "komut": "cloudflared.exe tunnel --url http://127.0.0.1:8795",
+    "dizin": "",
+    "port": null,
+    "url": "",
+    "yerlesik": true
+  },
+  {
+    "id": "tarama",
+    "ad": "Zirve Tarama Motoru",
+    "aciklama": "Finviz ve Yahoo Finance üzerinden tüm zamanların zirvesindeki hisseleri tarar",
+    "komut": "python tara.py",
+    "dizin": "",
+    "port": null,
+    "url": "",
+    "yerlesik": true
+  },
+  {
+    "id": "eski_sunucu",
+    "ad": "Eski Platform (Port 8790)",
+    "aciklama": "Önceki masaüstü sürümünün arka plan servisi",
+    "komut": "python platform_backend.py",
+    "dizin": "",
+    "port": 8790,
+    "url": "http://127.0.0.1:8790",
+    "yerlesik": false
+  }
+]
