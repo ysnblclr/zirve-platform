@@ -43,6 +43,12 @@ PROCESSES: dict[str, subprocess.Popen | None] = {
 }
 
 TUNNEL_URL = ""
+URL_FILE = BASE_DIR / ".tunnel_url"
+if URL_FILE.exists():
+    try:
+        TUNNEL_URL = URL_FILE.read_text(encoding="utf-8").strip()
+    except Exception:
+        pass
 URL_REGEX = re.compile(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com")
 
 
@@ -57,6 +63,10 @@ def append_log(service: str, text: str):
                 m = URL_REGEX.search(line)
                 if m:
                     TUNNEL_URL = m.group(0)
+                    try:
+                        (BASE_DIR / ".tunnel_url").write_text(TUNNEL_URL, encoding="utf-8")
+                    except Exception:
+                        pass
 
 
 def reader_thread(service: str, pipe):
@@ -186,6 +196,13 @@ def get_service_status(name: str) -> dict:
     if name == "sunucu" and running:
         url = "http://127.0.0.1:8795"
     elif name == "tunel" and running:
+        if not TUNNEL_URL:
+            url_file = BASE_DIR / ".tunnel_url"
+            if url_file.exists():
+                try:
+                    TUNNEL_URL = url_file.read_text(encoding="utf-8").strip()
+                except Exception:
+                    pass
         if not TUNNEL_URL:
             # Loglardan son trycloudflare linkini ara
             for l in reversed(LOG_BUFFERS["tunel"]):
