@@ -1,16 +1,39 @@
 version: "3.8"
 
 services:
-  zirve:
+  # 1. Zirve Web Platformu (Ana Arayüz)
+  zirve-web:
     build: .
-    container_name: zirve_platform
+    container_name: zirve_web
     restart: unless-stopped
     ports:
       - "8795:8795"
     volumes:
       - ./veri:/app/veri
     environment:
-      # İsteğe bağlı: İnternete açtığınızda şifre koymak için alttaki satırları açabilirsiniz:
-      # - ZIRVE_KULLANICI=admin
-      # - ZIRVE_SIFRE=guclu_sifreniz_123
       - PYTHONUNBUFFERED=1
+      - PORT=8795
+    command: python sunucu.py --port 8795 --ag --acma
+
+  # 2. Cloudflare İnternet Tüneli (Dünyaya Açık Canlı HTTPS Linki)
+  zirve-tunel:
+    image: cloudflare/cloudflared:latest
+    container_name: zirve_tunel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://zirve-web:8795
+    depends_on:
+      - zirve-web
+
+  # 3. Zirve Kontrol Merkezi (Web Yönetim Paneli)
+  zirve-yonetici:
+    build: .
+    container_name: zirve_yonetici
+    restart: unless-stopped
+    ports:
+      - "8999:8999"
+    volumes:
+      - ./veri:/app/veri
+      - ./servisler.json:/app/servisler.json
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python yonetici.py

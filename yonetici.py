@@ -136,37 +136,62 @@ def reader_thread(service: str, pipe):
 
 
 def is_port_in_use(port: int) -> int | None:
-    """Port kullanımda ise sahibinin PID numarasını döner."""
-    try:
-        cmd = f'powershell -NoProfile -Command "(Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue).OwningProcess"'
-        out = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
-        if out:
-            pids = [int(p) for p in out.split() if p.isdigit()]
-            return pids[0] if pids else None
-    except Exception:
-        pass
+    """Port kullanımda ise sahibinin PID numarasını (veya 1) döner."""
+    if os.name == "nt":
+        try:
+            cmd = f'powershell -NoProfile -Command "(Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue).OwningProcess"'
+            out = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
+            if out:
+                pids = [int(p) for p in out.split() if p.isdigit()]
+                return pids[0] if pids else None
+        except Exception:
+            pass
+    else:
+        # Linux / Docker ortamı
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.3)
+                if s.connect_ex(("127.0.0.1", port)) == 0:
+                    return 1
+        except Exception:
+            pass
     return None
 
 
 def get_process_pid(process_name: str) -> int | None:
-    """Süreç adından PID bulur (Windows)."""
-    try:
-        cmd = f'powershell -NoProfile -Command "(Get-Process {process_name} -ErrorAction SilentlyContinue).Id"'
-        out = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
-        if out:
-            pids = [int(p) for p in out.split() if p.isdigit()]
-            return pids[0] if pids else None
-    except Exception:
-        pass
+    """Süreç adından PID bulur."""
+    if os.name == "nt":
+        try:
+            cmd = f'powershell -NoProfile -Command "(Get-Process {process_name} -ErrorAction SilentlyContinue).Id"'
+            out = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
+            if out:
+                pids = [int(p) for p in out.split() if p.isdigit()]
+                return pids[0] if pids else None
+        except Exception:
+            pass
+    else:
+        try:
+            out = subprocess.check_output(["pgrep", "-f", process_name], text=True, stderr=subprocess.DEVNULL).strip()
+            if out:
+                pids = [int(p) for p in out.split() if p.isdigit()]
+                return pids[0] if pids else None
+        except Exception:
+            pass
     return None
 
 
 def kill_pid(pid: int):
-    """Windows'ta PID ve tüm alt süreçlerini zorla sonlandırır."""
-    try:
-        subprocess.run(f"taskkill /F /T /PID {pid}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+    """PID ve tüm alt süreçlerini zorla sonlandırır."""
+    if os.name == "nt":
+        try:
+            subprocess.run(f"taskkill /F /T /PID {pid}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+    else:
+        try:
+            os.kill(pid, 9)
+        except Exception:
+            pass
 
 
 def resolve_command_tokens(cmd_str: str) -> list[str]:
