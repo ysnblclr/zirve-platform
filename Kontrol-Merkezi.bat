@@ -19,6 +19,7 @@ if %errorlevel% equ 0 (
 
 REM Python tespiti
 set PYEXE=py -3
+%PYEXE% -c "import sys" >nul 2>&1 || set PYEXE="C:\Users\Msi\AppData\Local\Programs\Python\Python311\python.exe"
 %PYEXE% -c "import sys" >nul 2>&1 || set PYEXE=python
 
 echo [BILGI] Kontrol Merkezi baslatiliyor...

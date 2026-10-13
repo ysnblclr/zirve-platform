@@ -7,11 +7,16 @@ echo ====================================================
 echo  ZIRVE PLATFORMU - TUM SERVISLER BASLATILIYOR
 echo ====================================================
 
+REM Python tespiti
+set PYEXE=py -3
+%PYEXE% -c "import sys" >nul 2>&1 || set PYEXE="C:\Users\Msi\AppData\Local\Programs\Python\Python311\python.exe"
+%PYEXE% -c "import sys" >nul 2>&1 || set PYEXE=python
+
 REM Kontrol merkezini baslat (arka planda)
 netstat -ano | findstr 127.0.0.1:8999 >nul
 if %errorlevel% neq 0 (
     echo [BILGI] Kontrol merkezi baslatiliyor...
-    start /min "" cmd /c "py -3 yonetici.py || python yonetici.py"
+    start /min "" cmd /c "%PYEXE% yonetici.py"
     timeout /t 2 >nul
 )
 
